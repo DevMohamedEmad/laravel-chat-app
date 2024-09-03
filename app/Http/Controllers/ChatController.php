@@ -12,7 +12,12 @@ class ChatController extends Controller
     public function chat($receiver_id)
     {
         $receiver = User::find($receiver_id);
-        return view('chat', compact('receiver'));
+        $chats = Message::where(function ($query) use ($receiver_id) {
+            $query->where('sender_id', auth()->user()->id)
+                ->where('receiver_id', $receiver_id);
+        })->orderBy('id', 'desc')->get();
+        
+        return view('chat', compact('receiver', 'chats'));
     }
 
     public function sendMessage(Request $request)
@@ -23,9 +28,7 @@ class ChatController extends Controller
             'message' => $request->message
         ];
 
-        Message::create($data);
-        // Push notification
-        // event(new ChatSent($request->receiver_id, $request->message, auth()->user()->id));
+       $message = Message::create($data);
 
         \broadcast(new ChatSent($request->receiver_id, $request->message, auth()->user()->id));
         return redirect()->back();

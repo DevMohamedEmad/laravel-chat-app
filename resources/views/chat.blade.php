@@ -21,6 +21,21 @@
                         </header>
 
                         <main class="msger-chat">
+                            @foreach($chats as $chat)
+                            @if($chat->receiver_id == auth()->user()->id)
+                            <div class="msg right-msg">
+                                <div class="msg-bubble">
+                                    <div class="msg-info">
+                                        <div class="msg-info-name">{{ auth()->user()->name }}</div>
+                                        <div class="msg-info-time">12:46</div>
+                                    </div>
+
+                                    <div class="msg-text">
+                                        You can change your name in JS section!
+                                    </div>
+                                </div>
+                            </div>
+                            @else
                             <div class="msg left-msg">
                                 <div class="msg-bubble">
                                     <div class="msg-info">
@@ -33,20 +48,9 @@
                                     </div>
                                 </div>
                             </div>
+                            @endif
+                            @endforeach
 
-                             <div class="msg right-msg">
-
-                                <div class="msg-bubble">
-                                    <div class="msg-info">
-                                        <div class="msg-info-name">{{ auth()->user()->name }}</div>
-                                        <div class="msg-info-time">12:46</div>
-                                    </div>
-
-                                    <div class="msg-text">
-                                        You can change your name in JS section!
-                                    </div>
-                                </div>
-                            </div>
                         </main>
 
                         <form class="msger-inputarea">
