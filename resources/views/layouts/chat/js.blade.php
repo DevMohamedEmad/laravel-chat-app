@@ -14,23 +14,31 @@
 
         const msgText = msgerInput.value;
         if (!msgText) return;
-        appendMessage(msgText);
+        appendMessage(msgText,{{ auth()->id() }});
         msgerInput.value = "";
     });
 
-    function appendMessage(message) {
-        $.post("{{ route('send.message') }}",
-        {
-            receiver_id:{{ $receiver->id }},
-            message:message,
-            _token:"{{ csrf_token() }}"
-        },
-             function(data) {
-        });
+    function appendMessage(message, sender) {
+        if (sender == {{ auth()->id() }}) {
+            $.post("{{ route('send.message') }}",
+            {
+                receiver_id:{{ $receiver->id }},
+                message:message,
+                _token:"{{ csrf_token() }}"
+            },
+                 function(data) {
+            });
 
-        let name = "{{ $receiver->name }}"
+            var name = "{{ auth()->user()->name }}"
+            var director = "right-msg"
+
+        }else{
+            var name = "{{ $receiver->name }}"
+            var director = "left-msg"
+        }
+
         const msgHTML = `
-            <div class="msg right-msg">
+            <div class="msg ${director}">
             <div class="msg-bubble">
                 <div class="msg-info">
                 <div class="msg-info-name">${name}</div>
@@ -69,8 +77,9 @@
     channel.bind('pusher:subscription_succeeded', function() {
         console.log('Subscribed to channel successfully');
     });
-    
+
     channel.bind('chatMessage', function(data) {
-        appendMessage(data.message);
+        if (data.sender_id == {{ auth()->id() }}) return;
+        appendMessage(data.message, data.sender_id);
     });
 </script>
